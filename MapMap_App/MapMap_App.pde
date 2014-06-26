@@ -36,6 +36,7 @@
 
 import processing.pdf.*;
 import processing.opengl.*;
+import java.util.Calendar;
 
 // grab a reference to the applet ... is used to register mouse events
 PApplet app = this;
@@ -67,7 +68,7 @@ int mX = 0, mY = 0;
 boolean savePngPdf = false;
 
 void setup() {
-  size(screenWidth-100, screenHeight-100, OPENGL);
+  size(displayWidth-100, displayHeight-100, OPENGL);
   frame.setResizable(true);
   println("helo");
 
@@ -91,7 +92,9 @@ void setup() {
 void draw() {  
   if (savePngPdf) {
     saveFrame(timestamp()+".png");
-    beginRecord(PDF, timestamp()+".pdf");
+    
+    // PDF export is broken
+    // beginRecord(PDF, timestamp()+".pdf");
   }
 
   rectMode(CENTER);
@@ -177,9 +180,12 @@ void draw() {
 
   if (savePngPdf) {
     savePngPdf = false;
-    println("saving to pdf – finishing");
-    endRecord();
-    println("saving to pdf – done");
+    println("saving to png – done");
+    
+    // PDF export is broken
+    //println("saving to pdf – finishing");
+    //endRecord();
+    //println("saving to pdf – done");
   }
 }
 
@@ -236,7 +242,7 @@ void keyReleased() {
 
   if (key=='e' || key=='E') {
     savePngPdf = true; 
-    println("saving to pdf - starting");
+    println("saving to png - starting");
   }
 
   if (key==BACKSPACE || key==DELETE) {
@@ -313,35 +319,57 @@ ArrayList<PVector> updateAnchorsDest(ArrayList<Anchor> theAnchors, ArrayList<Lin
 
 // -- xml load file --
 void loadFile() {
-  String openFilepath = selectInput("open xml");  // Opens file chooser
-  if (openFilepath != null) {
-    println(openFilepath);
+  selectInput("open xml", "fileSelected");  // Opens file chooser
+}
 
-    anchors = new ArrayList<Anchor>();
-    lines = new ArrayList<Line>();
 
-    XML xml = loadXML(openFilepath);
+// run once xml file is loaded
+void fileSelected(File selection) {
+  if (selection == null) {
+    println("Window was closed or the user hit cancel.");
+  } else {
+    // return selection.getAbsolutePath();
 
-    XML[] linesXml = xml.getChildren("line");
-    for (XML i : linesXml) {
-      Line l = new Line ( i.getFloat("orig_a_x"), i.getFloat("orig_a_y"), i.getFloat("orig_b_x"), i.getFloat("orig_b_y"), 
-      i.getFloat("dest_a_x"), i.getFloat("dest_a_y"), i.getFloat("dest_b_x"), i.getFloat("dest_b_y") );
-      lines.add( l );
+    String openFilepath = selection.getAbsolutePath();
+    println( openFilepath );
+
+    if (openFilepath != null) {
+      println(openFilepath);
+
+      anchors = new ArrayList<Anchor>();
+      lines = new ArrayList<Line>();
+
+      XML xml = loadXML(openFilepath);
+
+      XML[] linesXml = xml.getChildren("line");
+      for (XML i : linesXml) {
+        Line l = new Line ( i.getFloat("orig_a_x"), i.getFloat("orig_a_y"), i.getFloat("orig_b_x"), i.getFloat("orig_b_y"), 
+        i.getFloat("dest_a_x"), i.getFloat("dest_a_y"), i.getFloat("dest_b_x"), i.getFloat("dest_b_y") );
+        lines.add( l );
+      }
+
+      XML[] anchorsXml = xml.getChildren("line");
+      for (XML i : anchorsXml) {
+        Anchor a = new Anchor ( i.getFloat("orig_x"), i.getFloat("orig_y"), i.getFloat("dest_x"), i.getFloat("dest_y") );
+        anchors.add( a );
+      }
+
+      updateAchors();
     }
-
-    XML[] anchorsXml = xml.getChildren("line");
-    for (XML i : anchorsXml) {
-      Anchor a = new Anchor ( i.getFloat("orig_x"), i.getFloat("orig_y"), i.getFloat("dest_x"), i.getFloat("dest_y") );
-      anchors.add( a );
-    }
-
-    updateAchors();
   }
 }
 
+
 // -- xml save points --
 void saveXML() {
-  String savePath = selectOutput();  // Opens file chooser
+  selectOutput("Select a file to write to:", "outputSelected");  // Opens file chooser
+}
+
+
+void outputSelected(File selection) {
+
+  String savePath = selection.getAbsolutePath();
+
   if (savePath != null) {
     println("save points to xml -> start");
     XML xml = new XML("map_data");
