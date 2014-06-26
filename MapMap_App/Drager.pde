@@ -18,7 +18,7 @@ public class Drager
   }
 
   void preRemove() {
-    app.unregisterMouseEvent(this);
+    app.unregisterMethod("mouseEvent", this);
   }
 
   void draw() {

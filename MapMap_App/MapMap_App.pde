@@ -92,7 +92,9 @@ void setup() {
 void draw() {  
   if (savePngPdf) {
     saveFrame(timestamp()+".png");
-    beginRecord(PDF, timestamp()+".pdf");
+    
+    // PDF export is broken
+    // beginRecord(PDF, timestamp()+".pdf");
   }
 
   rectMode(CENTER);
@@ -178,9 +180,12 @@ void draw() {
 
   if (savePngPdf) {
     savePngPdf = false;
-    println("saving to pdf – finishing");
-    endRecord();
-    println("saving to pdf – done");
+    println("saving to png – done");
+    
+    // PDF export is broken
+    //println("saving to pdf – finishing");
+    //endRecord();
+    //println("saving to pdf – done");
   }
 }
 
@@ -237,7 +242,7 @@ void keyReleased() {
 
   if (key=='e' || key=='E') {
     savePngPdf = true; 
-    println("saving to pdf - starting");
+    println("saving to png - starting");
   }
 
   if (key==BACKSPACE || key==DELETE) {
