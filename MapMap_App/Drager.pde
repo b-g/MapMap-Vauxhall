@@ -9,7 +9,7 @@ public class Drager
   boolean isDragging = false;
 
   public Drager (float x, float y, float rectSize, color col) {
-    app.registerMouseEvent(this); // app is global :(
+    app.registerMethod("mouseEvent", this); // app is global :(
     this.p = new PVector(x, y);
     this.rectSize = rectSize;
     this.rectRadius = rectSize/2;
@@ -54,14 +54,16 @@ public class Drager
     }
   }
 
+
+
   public void mouseEvent(MouseEvent event) {
     isOver = isOver();
 
-    switch (event.getID()) {
-    case MouseEvent.MOUSE_PRESSED:
+    switch (event.getAction()) {
+    case MouseEvent.PRESS:
       if (isOver) isDragging = true;
       break;
-    case MouseEvent.MOUSE_RELEASED:
+    case MouseEvent.RELEASE:
       isDragging = false;
       break;
     }
